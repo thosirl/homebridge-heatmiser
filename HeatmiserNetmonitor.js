@@ -33,21 +33,25 @@ HeatmiserNetmonitor.prototype = {
 
     var hm = new heatmiser.Netmonitor(this.ip_address, this.pin);
 
-    hm.getInfo(this.network_address, function(data) {
+    hm.getInfo(this.network_address);
 
+    hm.on('success', function(data) {
         this.log('getTargetTemperature succeeded!');
-        var m = data.dcb.heating_on;
-        var mode;
+	var m = data.dcb.heating_on;
+       	var mode;
 
-        if( m == "cool" ){
-          mode = Characteristic.CurrentHeatingCoolingState.COOL;
-        }else if( m == true ){
-          mode = Characteristic.CurrentHeatingCoolingState.HEAT;
+       	if( m == "cool" ){
+       	   	mode = Characteristic.CurrentHeatingCoolingState.COOL;
+       	}else if( m == true ){
+       		mode = Characteristic.CurrentHeatingCoolingState.HEAT;
         }else{
-          mode = Characteristic.CurrentHeatingCoolingState.OFF;
-        }
-        callback(null, mode);
+       		mode = Characteristic.CurrentHeatingCoolingState.OFF;
+       	}
+       	callback(null, mode);
 
+    }.bind(this));
+    hm.on('error', function(e){
+	callback(e);
     }.bind(this));
   },
 
@@ -62,7 +66,9 @@ HeatmiserNetmonitor.prototype = {
 
     var hm = new heatmiser.Netmonitor(this.ip_address, this.pin);
 
-    hm.getInfo(this.network_address, function(data) {
+    hm.getInfo(this.network_address)
+
+    hm.on('success', function(data) {
         this.log('getTargetHeatingCoolingState succeeded!');
         var m = data.dcb.heating_on;
         var mode;
@@ -77,6 +83,10 @@ HeatmiserNetmonitor.prototype = {
 
         callback(null, mode);
     }.bind(this));
+    hm.on('error', function(e){
+        callback(e);
+    }.bind(this));
+
   },
 
   getCurrentTemperature: function(callback) {
@@ -84,14 +94,18 @@ HeatmiserNetmonitor.prototype = {
 
     var hm = new heatmiser.Netmonitor(this.ip_address, this.pin);
 
-    hm.getInfo(this.network_address, function(data) {
+    hm.getInfo(this.network_address);
+
+    hm.on('success', function(data) {
         this.log('getCurrentTemperature succeeded!');
 
 	var c = data.dcb.remote_air_temp
 
         callback(null, c);
     }.bind(this));
-
+    hm.on('error', function(e){
+        callback(e);
+    }.bind(this));
   },
 
   getTargetTemperature: function(callback) {
@@ -99,12 +113,17 @@ HeatmiserNetmonitor.prototype = {
 
     var hm = new heatmiser.Netmonitor(this.ip_address, this.pin);
 
-    hm.getInfo(this.network_address, function(data) {
+    hm.getInfo(this.network_address);
+    hm.on('success', function(data) {
         this.log('getTargetTemperature succeeded!');
         var target_temp = data.dcb.set_room_temp
 
         callback(null, target_temp);
     }.bind(this));
+    hm.on('error', function(e){
+        callback(e);
+    }.bind(this));
+
   },
 
   setTargetTemperature: function(targetTemperature, callback){
@@ -118,21 +137,28 @@ HeatmiserNetmonitor.prototype = {
 
     var hm = new heatmiser.Netmonitor(this.ip_address, this.pin);
     hm.write_device(this.network_address,dcb1);
-
-    callback(null);
-
+    hm.on('success', function(data){
+	callback(null);
+    }.bind(this));
+    hm.on('error', function(e){
+        callback(e);
+    }.bind(this));
   },
 
   getTemperatureDisplayUnits: function(callback) {
     this.log("getTemperatureDisplayUnits");
     var hm = new heatmiser.Netmonitor(this.ip_address, this.pin);
-    hm.getInfo(this.network_address, function(data) {
+    hm.getInfo(this.network_address);
+
+    hm.on('success', function(data) {
         this.log('setTemperatureDisplayUnits succeeded!');
         var units = data.dcb.temp_format
 
         callback(null, units);
     }.bind(this));
-
+    hm.on('error', function(e){
+        callback(e);
+    }.bind(this));
   },
 
   setTemperatureDisplayUnits: function(displayUnits, callback){
